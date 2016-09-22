@@ -11,14 +11,12 @@ import KeenClient
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        var client : KeenClient;
-        client = KeenClient.sharedClient(withProjectID: "YOUR_KEEN_PROJECT_ID",
+        let _ = KeenClient.sharedClient(withProjectID: "YOUR_KEEN_PROJECT_ID",
             andWriteKey: "YOUR_KEEN_WRITE_KEY",
-            andReadKey: "YOUR_KEEN_READ_KEY");
+            andReadKey: "YOUR_KEEN_READ_KEY")
         return true
     }
 
@@ -43,7 +41,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
-

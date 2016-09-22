@@ -70,6 +70,8 @@
     result = [UIImage imageWithCGImage:uiImage];
     CGImageRelease(uiImage);
     
+    CVPixelBufferRelease(pixelBuffer);
+    
     return result;
 }
 

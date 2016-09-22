@@ -183,7 +183,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func layoutLocalVideoContainer() {
-        var rect:CGRect! = CGRect.zero
+        var rect: CGRect! = CGRect.zero
         
         // If connected to a Conversation, display a small representaiton of the local video track in the bottom right corner
         if clientStatus == .connected {
@@ -210,7 +210,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
                     CGRect(x: 0, y: 0, width: self.view.frame.width,  height: self.view.frame.height)
             } else {
                 // In this block, because the TWCVideoViewRenderer is handling remote video track rotation automatically, we simply set the remote video container size to full screen
-                self.remoteVideoContainer!.bounds = CGRect(x: 0,y: 0,width: self.view.frame.width, height: self.view.frame.height)
+                self.remoteVideoContainer!.bounds = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
             }
             self.remoteVideoContainer!.center = self.view.center
             self.remoteVideoRenderer!.view.bounds = self.remoteVideoContainer!.frame
