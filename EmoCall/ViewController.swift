@@ -8,6 +8,7 @@
 
 import UIKit
 import KeenClient
+import TwilioCommon
 
 class ViewController: UIViewController, UITextFieldDelegate {
     
@@ -47,61 +48,61 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     // ConversationsClient status - used to dynamically update our UI
     enum ConversationsClientStatus: Int {
-        case None = 0
-        case FailedToListen
-        case Listening
-        case Connecting
-        case Connected
+        case none = 0
+        case failedToListen
+        case listening
+        case connecting
+        case connected
     }
     
     // Default status to None
-    var clientStatus: ConversationsClientStatus = .None
+    var clientStatus: ConversationsClientStatus = .none
     
-    func updateClientStatus(status: ConversationsClientStatus, animated: Bool) {
+    func updateClientStatus(_ status: ConversationsClientStatus, animated: Bool) {
         self.clientStatus = status
         
         // Update UI elements when the ConversationsClient status changes
         switch self.clientStatus {
-        case .None:
+        case .none:
             break
-        case .FailedToListen:
+        case .failedToListen:
             spinner.stopAnimating()
-            self.statusMessage.hidden = false
+            self.statusMessage.isHidden = false
             self.statusMessage.text = "Failure while attempting to listen for Conversation Invites."
-            self.view.bringSubviewToFront(self.statusMessage)
-            self.localVideoContainer?.hidden = true
-            self.emojiField.hidden = true
-            self.valenceField.hidden = true
-        case .Listening:
+            self.view.bringSubview(toFront: self.statusMessage)
+            self.localVideoContainer?.isHidden = true
+            self.emojiField.isHidden = true
+            self.valenceField.isHidden = true
+        case .listening:
             spinner.stopAnimating()
-            self.disconnectButton.hidden = true
-            self.inviteeTextField.hidden = false
-            self.localVideoContainer?.hidden = false
-            self.statusMessage.hidden = true
-            self.emojiField.hidden = true
-            self.valenceField.hidden = true
-            KeenClient.sharedClient().uploadWithFinishedBlock(nil);
-        case .Connecting:
+            self.disconnectButton.isHidden = true
+            self.inviteeTextField.isHidden = false
+            self.localVideoContainer?.isHidden = false
+            self.statusMessage.isHidden = true
+            self.emojiField.isHidden = true
+            self.valenceField.isHidden = true
+            KeenClient.shared().upload(finishedBlock: nil);
+        case .connecting:
             self.spinner.startAnimating()
-            self.inviteeTextField.hidden = true
-            self.localVideoContainer?.hidden = false
-            self.emojiField.hidden = true
-            self.valenceField.hidden = true
-        case .Connected:
+            self.inviteeTextField.isHidden = true
+            self.localVideoContainer?.isHidden = false
+            self.emojiField.isHidden = true
+            self.valenceField.isHidden = true
+        case .connected:
             self.spinner.stopAnimating()
-            self.inviteeTextField.hidden = true
+            self.inviteeTextField.isHidden = true
             self.view.endEditing(true)
-            self.disconnectButton.hidden = false
-            self.localVideoContainer?.hidden = false
-            self.emojiField.hidden = false
-            self.valenceField.hidden = false
+            self.disconnectButton.isHidden = false
+            self.localVideoContainer?.isHidden = false
+            self.emojiField.isHidden = false
+            self.valenceField.isHidden = false
         }
         // Update UI Layout, optionally animated
         self.view.setNeedsLayout()
         if animated {
-            UIView.animateWithDuration(0.2) { () -> Void in
+            UIView.animate(withDuration: 0.2, animations: { () -> Void in
                 self.view.layoutIfNeeded()
-            }
+            }) 
         }
     }
     
@@ -113,41 +114,41 @@ class ViewController: UIViewController, UITextFieldDelegate {
         // Video containers
         self.remoteVideoContainer = UIView(frame: self.view.frame)
         self.view.addSubview(self.remoteVideoContainer!)
-        self.remoteVideoContainer!.backgroundColor = UIColor.blackColor()
+        self.remoteVideoContainer!.backgroundColor = UIColor.black
         self.localVideoContainer = UIView(frame: self.view.frame)
         self.view.addSubview(self.localVideoContainer!)
-        self.localVideoContainer!.backgroundColor = UIColor.blackColor()
-        self.localVideoContainer!.hidden = true
+        self.localVideoContainer!.backgroundColor = UIColor.black
+        self.localVideoContainer!.isHidden = true
         
         // Entry text field for the identity to invite to a Conversation (the invitee)
         inviteeTextField.alpha = 0.9
-        inviteeTextField.hidden = true
-        inviteeTextField.autocorrectionType = .No
-        inviteeTextField.returnKeyType = .Send
-        self.view.bringSubviewToFront(self.inviteeTextField)
-        self.view.bringSubviewToFront(self.emojiField)
-        self.view.bringSubviewToFront(self.valenceField)
-        self.emojiField.hidden = true
-        self.valenceField.hidden = true
+        inviteeTextField.isHidden = true
+        inviteeTextField.autocorrectionType = .no
+        inviteeTextField.returnKeyType = .send
+        self.view.bringSubview(toFront: self.inviteeTextField)
+        self.view.bringSubview(toFront: self.emojiField)
+        self.view.bringSubview(toFront: self.valenceField)
+        self.emojiField.isHidden = true
+        self.valenceField.isHidden = true
         self.inviteeTextField.delegate = self
         
         // Spinner - shown when attempting to listen for Invites and when sending an Invite
         self.view.addSubview(spinner)
         spinner.startAnimating()
-        self.view.bringSubviewToFront(self.spinner)
+        self.view.bringSubview(toFront: self.spinner)
         
         // Status message - used to display errors
-        statusMessage.hidden = true
+        statusMessage.isHidden = true
         
         // Disconnect button
-        self.view.bringSubviewToFront(self.disconnectButton)
-        self.disconnectButton.hidden = true
+        self.view.bringSubview(toFront: self.disconnectButton)
+        self.disconnectButton.isHidden = true
         
         // Setup the local media
         self.setupLocalMedia()
         
         // Start listening for Invites
-        TwilioConversationsClient.setLogLevel(.Warning)
+        TwilioConversationsClient.setLogLevel(.warning)
         self.listenForInvites()
     }
     
@@ -164,40 +165,40 @@ class ViewController: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden : Bool {
         return true
     }
     
     // Hide the keyboard whenever a touch is detected on this view
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        super.touchesBegan(touches, withEvent: event)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
         self.view.endEditing(true)
     }
     
     // Disconnect button
-    @IBAction func disconnectButtonClicked (sender : AnyObject) {
+    @IBAction func disconnectButtonClicked (_ sender : AnyObject) {
         if conversation != nil {
             conversation?.disconnect()
         }
     }
     
     func layoutLocalVideoContainer() {
-        var rect:CGRect! = CGRectZero
+        var rect:CGRect! = CGRect.zero
         
         // If connected to a Conversation, display a small representaiton of the local video track in the bottom right corner
-        if clientStatus == .Connected {
-            rect!.size = UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) ? CGSizeMake(160, 90) : CGSizeMake(90, 160)
-            rect!.origin = CGPointMake(self.view.frame.width - rect!.width - 10, self.view.frame.height - rect!.height - 10)
+        if clientStatus == .connected {
+            rect!.size = UIDeviceOrientationIsLandscape(UIDevice.current.orientation) ? CGSize(width: 160, height: 90) : CGSize(width: 90, height: 160)
+            rect!.origin = CGPoint(x: self.view.frame.width - rect!.width - 10, y: self.view.frame.height - rect!.height - 10)
         } else {
             // If not yet connected to a Conversation (e.g. Camera preview), display the local video feed as full screen
             rect = self.view.frame
         }
         self.localVideoContainer!.frame = rect
-        self.localVideoContainer?.alpha = clientStatus == .Connecting ? 0.25 : 1.0
+        self.localVideoContainer?.alpha = clientStatus == .connecting ? 0.25 : 1.0
     }
     
     func layoutRemoteVideoContainer() {
-        if clientStatus == .Connected {
+        if clientStatus == .connected {
             // When connected to a Conversation, display the remote video feed as full screen.
             if applicationHandlesRemoteVideoFrameRotation {
                 // This block demonstrates how to manually handle remote video track rotation
@@ -205,17 +206,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 let transform = TWCVideoOrientationMakeTransform(self.remoteVideoRenderer!.videoFrameOrientation)
                 self.remoteVideoRenderer!.view.transform = transform
                 self.remoteVideoContainer!.bounds = (rotated == true) ?
-                    CGRectMake(0, 0, self.view.frame.height, self.view.frame.width) :
-                    CGRectMake(0, 0, self.view.frame.width,  self.view.frame.height)
+                    CGRect(x: 0, y: 0, width: self.view.frame.height, height: self.view.frame.width) :
+                    CGRect(x: 0, y: 0, width: self.view.frame.width,  height: self.view.frame.height)
             } else {
                 // In this block, because the TWCVideoViewRenderer is handling remote video track rotation automatically, we simply set the remote video container size to full screen
-                self.remoteVideoContainer!.bounds = CGRectMake(0,0,self.view.frame.width, self.view.frame.height)
+                self.remoteVideoContainer!.bounds = CGRect(x: 0,y: 0,width: self.view.frame.width, height: self.view.frame.height)
             }
             self.remoteVideoContainer!.center = self.view.center
             self.remoteVideoRenderer!.view.bounds = self.remoteVideoContainer!.frame
         } else {
             // If not connected to a Conversation, there is no remote video to display
-            self.remoteVideoContainer!.frame = CGRectZero
+            self.remoteVideoContainer!.frame = CGRect.zero
         }
     }
     
@@ -237,10 +238,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func createCapturer() {
-        self.camera = TWCCameraCapturer(delegate: self, source: .FrontCamera)
+        self.camera = TWCCameraCapturer(delegate: self, source: .frontCamera)
         let videoCaptureConstraints = self.videoCaptureConstraints()
         let videoTrack = TWCLocalVideoTrack(capturer: self.camera!, constraints: videoCaptureConstraints)
-        if self.localMedia!.addTrack(videoTrack) == false {
+        if self.localMedia!.add(videoTrack) == false {
             print("Error: Failed to create a video track using the local camera.")
         }
     }
@@ -279,63 +280,63 @@ class ViewController: UIViewController, UITextFieldDelegate {
         setupLocalMedia()
         
         // Reset the client ui status
-        updateClientStatus(self.client!.listening ? .Listening : .FailedToListen, animated: true)
+        updateClientStatus(self.client!.listening ? .listening : .failedToListen, animated: true)
     }
     
     // Respond to "Send" button on keyboard
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         inviteParticipant(textField.text!)
         return false
     }
     
-    func inviteParticipant(inviteeIdentity: String) {
+    func inviteParticipant(_ inviteeIdentity: String) {
         if inviteeIdentity.isEmpty == false {
             self.outgoingInvite =
-                self.client?.inviteToConversation(inviteeIdentity, localMedia:self.localMedia!) { conversation, err in
+                self.client?.invite(toConversation: inviteeIdentity, localMedia:self.localMedia!) { conversation, err in
                     self.outgoingInviteCompletionHandler(conversation, err: err)
             }
-            self.updateClientStatus(.Connecting, animated: false)
+            self.updateClientStatus(.connecting, animated: false)
         }
     }
     
-    func outgoingInviteCompletionHandler(conversation: TWCConversation?, err: NSError?) {
+    func outgoingInviteCompletionHandler(_ conversation: TWCConversation?, err: Error?) {
         if err == nil {
             // The invitee accepted our Invite
             self.conversation = conversation
             self.conversation?.delegate = self
         } else {
             // The invitee rejected our Invite or the Invite was not acknowledged
-            let alertController = UIAlertController(title: "Oops!", message: "Unable to connect to the remote party.", preferredStyle: .Alert)
-            let OKAction = UIAlertAction(title: "OK", style: .Default) { (action) in  }
+            let alertController = UIAlertController(title: "Oops!", message: "Unable to connect to the remote party.", preferredStyle: .alert)
+            let OKAction = UIAlertAction(title: "OK", style: .default) { (action) in  }
             alertController.addAction(OKAction)
-            self.presentViewController(alertController, animated: true) { }
+            self.present(alertController, animated: true) { }
             
             // Destroy the old local media and set up new local media.
             self.resetClientStatus()
         }
     }
     
-    func showEmoji(emoji : String) -> Void {
+    func showEmoji(_ emoji : String) -> Void {
         self.emojiField.text = emoji
     }
 
 
-    func showValence(valence : Float) -> Void {
+    func showValence(_ valence : Float) -> Void {
         if valence >= 0 {
             self.valenceField.text = "👍"
-            self.valenceField.textColor = UIColor.whiteColor()
+            self.valenceField.textColor = UIColor.white
             self.valenceField.backgroundColor = UIColor.init(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(valence) / 100.0 + 0.4)
         } else {
             self.valenceField.text = "👎"
-            self.valenceField.textColor = UIColor.whiteColor()
+            self.valenceField.textColor = UIColor.white
             self.valenceField.backgroundColor = UIColor.init(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(valence) / 100.0 + 0.4)
         }
         if self.conversation?.sid != nil && valence != 0.0 {
             
-            let event = ["conversation_sid": String!(self.conversation?.sid), "conversation_valence": NSNumber(float: valence)];
+            let event = ["conversation_sid": String((self.conversation?.sid!)!)!, "conversation_valence": NSNumber(value: valence)] as [String : Any]
             do {
-                try KeenClient.sharedClient().addEvent(event, toEventCollection: "affdex_valence_events")
+                try KeenClient.shared().addEvent(event, toEventCollection: "affdex_valence_events")
             } catch _ {
             };
         }
@@ -344,42 +345,42 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
 // MARK: TwilioConversationsClientDelegate
 extension ViewController: TwilioConversationsClientDelegate {
-    func conversationsClient(conversationsClient: TwilioConversationsClient,
-                             didFailToStartListeningWithError error: NSError) {
+    func conversationsClient(_ conversationsClient: TwilioConversationsClient,
+                             didFailToStartListeningWithError error: Error) {
         
         // Do not interrupt the on going conversation UI. Client status will
         // changed to .FailedToListen when conversation ends.
         if (conversation == nil) {
-            self.updateClientStatus(.FailedToListen, animated: false)
+            self.updateClientStatus(.failedToListen, animated: false)
         }
     }
     
-    func conversationsClientDidStartListeningForInvites(conversationsClient: TwilioConversationsClient) {
+    func conversationsClientDidStartListening(forInvites conversationsClient: TwilioConversationsClient) {
         // Successfully listening for Invites
         
         // Do not interrupt the on going conversation UI. Client status will
         // changed to .Listening when conversation ends.
         if (conversation == nil) {
-            self.updateClientStatus(.Listening, animated: true)
+            self.updateClientStatus(.listening, animated: true)
         }
     }
     
-    func conversationsClientDidStopListeningForInvites(conversationsClient: TwilioConversationsClient, error: NSError?) {
+    func conversationsClientDidStopListening(forInvites conversationsClient: TwilioConversationsClient, error: Error?) {
         // Do not interrupt the on going conversation UI. Client status will
         // changed to .Listening when conversation ends.
         if (conversation == nil) {
-            self.updateClientStatus(.FailedToListen, animated: true)
+            self.updateClientStatus(.failedToListen, animated: true)
         }
     }
     
     // Automatically accept any incoming Invite
-    func conversationsClient(conversationsClient: TwilioConversationsClient,
-                             didReceiveInvite invite: TWCIncomingInvite) {
-        let alertController = UIAlertController(title: "Incoming Invite!", message: "Invite from \(invite.from)", preferredStyle: .Alert)
-        let acceptAction = UIAlertAction(title: "Accept", style: .Default) { (action) in
+    func conversationsClient(_ conversationsClient: TwilioConversationsClient,
+                             didReceive invite: TWCIncomingInvite) {
+        let alertController = UIAlertController(title: "Incoming Invite!", message: "Invite from \(invite.from)", preferredStyle: .alert)
+        let acceptAction = UIAlertAction(title: "Accept", style: .default) { (action) in
             // Accept the incoming Invite with pre-configured LocalMedia
-            self.updateClientStatus(.Connecting, animated: false)
-            invite.acceptWithLocalMedia(self.localMedia!, completion: { (conversation, err) -> Void in
+            self.updateClientStatus(.connecting, animated: false)
+            invite.accept(with: self.localMedia!, completion: { (conversation, err) -> Void in
                 if err == nil {
                     self.conversation = conversation
                     conversation!.delegate = self
@@ -392,22 +393,22 @@ extension ViewController: TwilioConversationsClientDelegate {
             })
         }
         alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: "Reject", style: .Cancel) { (action) in
+        let rejectAction = UIAlertAction(title: "Reject", style: .cancel) { (action) in
             invite.reject()
         }
         alertController.addAction(rejectAction)
-        self.presentViewController(alertController, animated: true) { }
+        self.present(alertController, animated: true) { }
     }
 }
 
 // MARK: TWCConversationDelegate
 extension ViewController: TWCConversationDelegate {
-    func conversation(conversation: TWCConversation, didConnectParticipant participant: TWCParticipant) {
+    func conversation(_ conversation: TWCConversation, didConnect participant: TWCParticipant) {
         // Remote Participant connected
         participant.delegate = self
     }
     
-    func conversationEnded(conversation: TWCConversation) {
+    func conversationEnded(_ conversation: TWCConversation) {
         self.conversation = nil
         self.resetClientStatus()
     }
@@ -415,7 +416,7 @@ extension ViewController: TWCConversationDelegate {
 
 // MARK: TWCParticipantDelegate
 extension ViewController: TWCParticipantDelegate {
-    func participant(participant: TWCParticipant, addedVideoTrack videoTrack: TWCVideoTrack) {
+    func participant(_ participant: TWCParticipant, addedVideoTrack videoTrack: TWCVideoTrack) {
         // Remote Participant added a video track. Render it onto the remote video track container.
         self.remoteVideoRenderer = TWCVideoViewRenderer(delegate: self)
         self.affectivaVideoRenderer = AffectivaRenderer(updateClosure: { (valence: Float, emoji: String) -> Void in
@@ -430,10 +431,10 @@ extension ViewController: TWCParticipantDelegate {
         self.remoteVideoContainer!.addSubview(self.remoteVideoRenderer!.view)
         
         // Animate the remote video track onto the screen.
-        self.updateClientStatus(.Connected, animated: true)
+        self.updateClientStatus(.connected, animated: true)
     }
     
-    func participant(participant: TWCParticipant, removedVideoTrack videoTrack: TWCVideoTrack) {
+    func participant(_ participant: TWCParticipant, removedVideoTrack videoTrack: TWCVideoTrack) {
         // Remote Participant removed their video track
         self.remoteVideoRenderer!.view.removeFromSuperview()
     }
@@ -441,7 +442,7 @@ extension ViewController: TWCParticipantDelegate {
 
 // MARK: TWCLocalMediaDelegate
 extension ViewController: TWCLocalMediaDelegate {
-    func localMedia(media: TWCLocalMedia, didFailToAddVideoTrack videoTrack: TWCVideoTrack, error: NSError) {
+    func localMedia(_ media: TWCLocalMedia, didFailToAdd videoTrack: TWCVideoTrack, error: Error) {
         // Called when there is a failure attempting to add a local video track to LocalMedia. In this application, it is likely to be caused when capturing a video track from the device camera using invalid video constraints.
         print("Error: failed to add a local video track to LocalMedia.")
     }
@@ -449,19 +450,19 @@ extension ViewController: TWCLocalMediaDelegate {
 
 // MARK: TWCCameraCapturerDelegate
 extension ViewController : TWCCameraCapturerDelegate {
-    func cameraCapturerPreviewDidStart(capturer: TWCCameraCapturer) {
+    func cameraCapturerPreviewDidStart(_ capturer: TWCCameraCapturer) {
         if (self.client!.listening) {
-            self.localVideoContainer!.hidden = false
+            self.localVideoContainer!.isHidden = false
         }
     }
     
-    func cameraCapturer(capturer: TWCCameraCapturer, didStartWithSource source: TWCVideoCaptureSource) {
-        self.statusMessage.hidden = true
+    func cameraCapturer(_ capturer: TWCCameraCapturer, didStartWith source: TWCVideoCaptureSource) {
+        self.statusMessage.isHidden = true
     }
     
-    func cameraCapturer(capturer: TWCCameraCapturer, didStopRunningWithError error: NSError) {
+    func cameraCapturer(_ capturer: TWCCameraCapturer, didStopRunningWithError error: Error) {
         // Failed to capture video from the local device camera
-        self.statusMessage.hidden = false
+        self.statusMessage.isHidden = false
         self.statusMessage.text = "Error: failed to capture video from your device's camera."
     }
     
@@ -471,25 +472,25 @@ extension ViewController : TWCCameraCapturerDelegate {
 
 // MARK: TWCVideoViewRendererDelegate
 extension ViewController: TWCVideoViewRendererDelegate {
-    func rendererDidReceiveVideoData(renderer: TWCVideoViewRenderer) {
+    func rendererDidReceiveVideoData(_ renderer: TWCVideoViewRenderer) {
         // Called when the first frame of video is received on the remote Participant's video track
         self.view.setNeedsLayout()
     }
     
-    func renderer(renderer: TWCVideoViewRenderer, dimensionsDidChange dimensions: CMVideoDimensions) {
+    func renderer(_ renderer: TWCVideoViewRenderer, dimensionsDidChange dimensions: CMVideoDimensions) {
         // Called when the remote Participant's video track changes dimensions
         self.view.setNeedsLayout()
     }
     
-    func renderer(renderer: TWCVideoViewRenderer, orientationDidChange orientation: TWCVideoOrientation) {
+    func renderer(_ renderer: TWCVideoViewRenderer, orientationDidChange orientation: TWCVideoOrientation) {
         // Called when the remote Participant's video track is rotated. Only ever called if 'rendererShouldRotateContent' returns true.
         self.view.setNeedsLayout()
-        UIView.animateWithDuration(0.2) { () -> Void in
+        UIView.animate(withDuration: 0.2, animations: { () -> Void in
             self.view.layoutIfNeeded()
-        }
+        }) 
     }
     
-    func rendererShouldRotateContent(renderer: TWCVideoViewRenderer) -> Bool {
+    func rendererShouldRotateContent(_ renderer: TWCVideoViewRenderer) -> Bool {
         return !applicationHandlesRemoteVideoFrameRotation
     }
 }

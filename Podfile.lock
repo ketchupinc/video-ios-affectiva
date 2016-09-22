@@ -1,0 +1,29 @@
+PODS:
+  - AffdexSDK-iOS (3.1.1):
+    - AWSKinesis
+  - AWSCore (2.4.8)
+  - AWSKinesis (2.4.8):
+    - AWSCore (= 2.4.8)
+  - KeenClient (3.5.6):
+    - KeenClient/keen_sqlite (= 3.5.6)
+  - KeenClient/keen_sqlite (3.5.6)
+  - TwilioCommon (0.2.2)
+  - TwilioConversationsClient (0.24.1):
+    - TwilioCommon (~> 0.2.0)
+
+DEPENDENCIES:
+  - AffdexSDK-iOS
+  - KeenClient (~> 3.5.0)
+  - TwilioConversationsClient (~> 0.24.0)
+
+SPEC CHECKSUMS:
+  AffdexSDK-iOS: 5039eb0068e3117c651f80dc4989c074a7726e84
+  AWSCore: 7bc7e845f532dedc65b133cdf518bb44a2e28dfe
+  AWSKinesis: 74e1a5fb458fcbdb6a300f22ee108f4681793b6b
+  KeenClient: e471eab71a70077f7de8f2567d32e8fd7f99c2c6
+  TwilioCommon: b697446b6f151255c4118f065e959c3dedee44e5
+  TwilioConversationsClient: b14e7ad53f315bb3fbd86e4a2c9d3b6c07840739
+
+PODFILE CHECKSUM: d87f827c5599b7371d814222ccd0234258ad346f
+
+COCOAPODS: 1.1.0.rc.1
